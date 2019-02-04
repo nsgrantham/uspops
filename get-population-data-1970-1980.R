@@ -37,8 +37,4 @@ all_population_data_1970_1980 <- population_data_1970_1980 %>%
   summarize(population = sum(population)) %>%
   ungroup()
 
-%>%
-  left_join(decoded_record_data, by = "record_code") %>%
-  select(year, state_code, state, race_ethnic_origin, sex, age_group, everything(), -record_code)
-  
-write_tsv(all_population_data_1981_1989, file.path("data", "processed", "population-data-1981-1989.tsv"))
+write_tsv(all_population_data_1970_1980, file.path("data", "processed", "population-data-1970-1980.tsv"))
