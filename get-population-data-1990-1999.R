@@ -2,8 +2,6 @@ library(tidyverse)
 
 state_county_fips <- read_tsv(file.path("data", "processed", "state-county-fips.tsv"))
 
-population_data_urls <- paste0("https://www2.census.gov/programs-surveys/popest/tables/1990-2000/intercensal/st-co/stch-icen", unlist(year_codes), ".txt")
-
 read_population_data <- function(population_data_url) {
   read_table(population_data_url, col_names = c("year", "state_county_code", "age_group", 
                                                 "race_sex", "ethnic_origin", "population"))
@@ -23,25 +21,25 @@ year_codes <- list(
 )
 
 age_group_codes <- list(
-  "0" = "<1 year",
-  "1" = "1-4 years",
-  "2" = "5-9 years",
-  "3" = "10-14 years",
-  "4" = "15-19 years",
-  "5" = "20-24 years",
-  "6" = "25-29 years",
-  "7" = "30-34 years",
-  "8" = "35-39 years",
-  "9" = "40-44 years",
-  "10" = "45-49 years",
-  "11" = "50-54 years",
-  "12" = "55-59 years",
-  "13" = "60-64 years",
-  "14" = "65-69 years",
-  "15" = "70-74 years",
-  "16" = "75-79 years",
-  "17" = "80-84 years",
-  "18" = "85 years and over"
+  "0" = "0",
+  "1" = "1-4",
+  "2" = "5-9",
+  "3" = "10-14",
+  "4" = "15-19",
+  "5" = "20-24",
+  "6" = "25-29",
+  "7" = "30-34",
+  "8" = "35-39",
+  "9" = "40-44",
+  "10" = "45-49",
+  "11" = "50-54",
+  "12" = "55-59",
+  "13" = "60-64",
+  "14" = "65-69",
+  "15" = "70-74",
+  "16" = "75-79",
+  "17" = "80-84",
+  "18" = "85+"
 )
 
 race_sex_codes <- list(
@@ -69,6 +67,8 @@ process_population_data <- function(population_data) {
     left_join(state_county_fips, by = "state_county_code") %>%
     select(year, state_county_code, state, county, everything())
 }
+
+population_data_urls <- paste0("https://www2.census.gov/programs-surveys/popest/tables/1990-2000/intercensal/st-co/stch-icen", unlist(year_codes), ".txt")
 
 all_population_data_1990_1999 <- map(population_data_urls, read_population_data) %>%
   map_dfr(process_population_data)
