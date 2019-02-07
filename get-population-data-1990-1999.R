@@ -2,11 +2,6 @@ library(tidyverse)
 
 state_county_fips <- read_tsv(file.path("data", "processed", "state-county-fips.tsv"))
 
-read_population_data <- function(population_data_url) {
-  read_table(population_data_url, col_names = c("year", "state_county_code", "age_group", 
-                                                "race_sex", "ethnic_origin", "population"))
-}
-
 year_codes <- list(
   "90" = 1990,
   "91" = 1991,
@@ -43,34 +38,49 @@ age_group_codes <- list(
 )
 
 race_sex_codes <- list(
-  "1" = "White male",
-  "2" = "White female",
-  "3" = "Black male",
-  "4" = "Black female",
-  "5" = "American Indian or Alaska Native male",
-  "6" = "American Indian or Alaska Native female",
-  "7" = "Asian or Pacific Islander male",
-  "8" = "Asian or Pacific Islander female"
+  "1" = "White, Male",
+  "2" = "White, Female",
+  "3" = "Black, Male",
+  "4" = "Black, Female",
+  "5" = "American Indian or Alaska Native, Male",
+  "6" = "American Indian or Alaska Native, Female",
+  "7" = "Asian or Pacific Islander, Male",
+  "8" = "Asian or Pacific Islander, Female"
 )
 
-ethnic_origin_codes <- list(
-  "1" = "not Hispanic or Latino",
-  "2" = "Hispanic or Latino"
+hispanic_origin_codes <- list(
+  "1" = "Non-Hispanic",
+  "2" = "Hispanic"
 )
 
-process_population_data <- function(population_data) {
-  population_data %>%
+col_names <- c("year", "state_county_code", "age_group", 
+               "race_sex", "hispanic_origin", "population")
+
+tidy_up_population_data <- function(population_data_url) {
+  read_table(population_data_url, col_names = col_names) %>%
     mutate(year = recode(year, !!! year_codes),
            age_group = recode(age_group, !!! age_group_codes),
            race_sex = recode(race_sex, !!! race_sex_codes),
-           ethnic_origin = recode(ethnic_origin, !!! ethnic_origin_codes)) %>%
+           hispanic_origin = recode(hispanic_origin, !!! hispanic_origin_codes)) %>%
+    separate(race_sex, c("race", "sex"), sep = ", ") %>%
     left_join(state_county_fips, by = "state_county_code") %>%
-    select(year, state_county_code, state, county, everything())
+    select(year, state, county, hispanic_origin, race, sex, age_group, population)
 }
 
-population_data_urls <- paste0("https://www2.census.gov/programs-surveys/popest/tables/1990-2000/intercensal/st-co/stch-icen", unlist(year_codes), ".txt")
+messy_county_population_data_urls <- paste0(
+  "https://www2.census.gov/programs-surveys/popest/tables/1990-2000/intercensal/st-co/stch-icen",
+  unlist(year_codes),
+  ".txt"
+)
 
-all_population_data_1990_1999 <- map(population_data_urls, read_population_data) %>%
-  map_dfr(process_population_data)
+tidy_county_population_data <- messy_county_population_data_urls %>%
+  map_dfr(tidy_up_population_data) %>%
+  arrange(year, state, county, hispanic_origin, race, sex, age_group)
 
-write_tsv(all_population_data_1990_1999, file.path("data", "processed", "population-data-1990-1999.tsv"))
+write_tsv(tidy_county_population_data, file.path("data", "processed", "county-population-data-1990-1999.tsv"))
+
+tidy_state_population_data <- tidy_county_population_data %>%
+  group_by(year, state, hispanic_origin, race, sex, age_group) %>%
+  summarize(population = sum(population))
+
+write_tsv(tidy_state_population_data, file.path("data", "processed", "state-population-data-1990-1999.tsv"))

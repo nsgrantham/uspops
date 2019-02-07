@@ -8,7 +8,7 @@ source_file <- "https://www2.census.gov/programs-surveys/popest/datasets/1970-19
 target_file <- file.path("data", "raw", "e7080sta.txt")
 download.file(source_file, target_file)
 
-population_data_1970_1980 <- read_table(target_file, skip = 13)
+messy_state_population_data <- read_table(target_file, skip = 13)
 
 state_fips <- read_tsv(file.path("data", "processed", "state-fips.tsv"))
 
@@ -27,14 +27,16 @@ year_codes <- list(
 )
 
 
-all_population_data_1970_1980 <- population_data_1970_1980 %>%
+tidy_state_population_data <- messy_state_population_data %>%
   rename(state_code = Fip, age_group = Age) %>%
   gather(year, population, -state_code, -age_group) %>%
   mutate(state_code = sprintf("%02s", str_sub(state_code, start = 1, end = -4)),
          year = recode(year, !!! year_codes),
          age_group = recode(age_group, "62-64M" = "62-64", "62-64F" = "62-64")) %>%
-  group_by(year, state_code, age_group, year) %>%
+  left_join(state_fips, by = "state_code") %>%
+  group_by(year, state, age_group) %>%
   summarize(population = sum(population)) %>%
-  ungroup()
+  ungroup() %>%
+  arrange(year, state, age_group)
 
-write_tsv(all_population_data_1970_1980, file.path("data", "processed", "population-data-1970-1980.tsv"))
+write_tsv(tidy_state_population_data, file.path("data", "processed", "state-population-data-1970-1980.tsv"))

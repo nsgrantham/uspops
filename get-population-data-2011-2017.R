@@ -5,17 +5,13 @@ state_county_fips <- read_tsv(file.path("data", "processed", "state-county-fips.
 state_fips <- read_tsv(file.path("data", "processed", "state-fips.tsv"))
 
 year_codes <- list(
-  "2" = 2000,
-  "3" = 2001,
-  "4" = 2002,
-  "5" = 2003,
-  "6" = 2004,
-  "7" = 2005,
-  "8" = 2006,
-  "9" = 2007,
-  "10" = 2008,
-  "11" = 2009,
-  "13" = 2010
+  "3" = 2011,
+  "4" = 2012,
+  "5" = 2013,
+  "6" = 2014,
+  "7" = 2015,
+  "8" = 2016,
+  "9" = 2017
 )
 
 age_group_codes <- list(
@@ -45,7 +41,7 @@ state_codes_except_puerto_rico <- state_fips %>%
   pull(state_code)
 
 messy_county_population_data_urls <- paste0(
-  "https://www2.census.gov/programs-surveys/popest/datasets/2000-2010/intercensal/county/co-est00int-alldata-",
+  "https://www2.census.gov/programs-surveys/popest/datasets/2010-2017/counties/asrh/cc-est2017-alldata-",
   state_codes_except_puerto_rico,
   ".csv"
 )
@@ -77,7 +73,7 @@ tidy_up_population_data <- function(population_data_url) {
            `Non-Hispanic, Native Hawaiian or Other Pacific Islander, Female` = NHNA_FEMALE,
            `Non-Hispanic, Two or More Races, Male` = NHTOM_MALE,
            `Non-Hispanic, Two or More Races, Female` = NHTOM_FEMALE) %>%
-    filter(year %in% c(2:11, 13), age_group != 99) %>%
+    filter(year %in% 3:9) %>%  # guessing that these codes correspond to 2011, ..., 2017
     gather(hispanic_origin_race_sex, population, -state, -county, -year, -age_group) %>%
     mutate(year = recode(year, !!! year_codes),
            age_group = recode(age_group, !!! age_group_codes)) %>%
@@ -90,11 +86,10 @@ tidy_county_population_data <- messy_county_population_data_urls %>%
   map_dfr(tidy_up_population_data) %>%
   arrange(year, state, county, hispanic_origin, race, sex, age_group)
 
-write_tsv(tidy_county_population_data, file.path("data", "processed", "county-population-data-2000-2010.tsv"))
+write_tsv(tidy_county_population_data, file.path("data", "processed", "county-population-data-2011-2017.tsv"))
 
 tidy_state_population_data <- tidy_county_population_data %>%
   group_by(year, state, hispanic_origin, race, sex, age_group) %>%
   summarize(population = sum(population))
 
-write_tsv(tidy_state_population_data, file.path("data", "processed", "state-population-data-2000-2010.tsv"))
-
+write_tsv(tidy_state_population_data, file.path("data", "processed", "state-population-data-2011-2017.tsv"))

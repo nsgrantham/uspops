@@ -10,7 +10,7 @@ download.file(source_file, target_file)
 age_groups <- c("0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", 
                 "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85+")
 
-population_data_1981_1989 <- read_table(target_file, col_names = c("record_code", age_groups))
+messy_state_population_data <- read_table(target_file, col_names = c("record_code", age_groups))
 
 state_fips <- read_tsv(file.path("data", "processed", "state-fips.tsv"))
 
@@ -31,11 +31,11 @@ sex_codes <- list(
   "2" = "Female"
 )
 
-race_ethnic_origin_codes <- list(
-  "1" = "White, non-Hispanic",
-  "2" = "Black, non-Hispanic",
-  "3" = "American Indian or Alaska Native, non-Hispanic",
-  "4" = "Asian or Pacific Islander, non-Hispanic",
+race_hispanic_origin_codes <- list(
+  "1" = "White, Non-Hispanic",
+  "2" = "Black, Non-Hispanic",
+  "3" = "American Indian or Alaska Native, Non-Hispanic",
+  "4" = "Asian or Pacific Islander, Non-Hispanic",
   "5" = "White, Hispanic",
   "6" = "Black, Hispanic",
   "7" = "American Indian or Alaska Native, Hispanic",
@@ -43,22 +43,24 @@ race_ethnic_origin_codes <- list(
 )
 
 
-decoded_record_data <- population_data_1981_1989 %>%
+decoded_records <- messy_state_population_data %>%
   pull(record_code) %>%
   str_split("", n = 5, simplify = TRUE) %>%
   as.tibble() %>%
-  magrittr::set_colnames(c("state_code_1", "state_code_2", "year", "race_ethnic_origin", "sex")) %>%
+  magrittr::set_colnames(c("state_code_1", "state_code_2", "year", "race_hispanic_origin", "sex")) %>%
   unite(state_code, state_code_1, state_code_2, sep = "") %>%
   mutate(year = recode(year, !!! year_codes),
-         race_ethnic_origin = recode(race_ethnic_origin, !!! race_ethnic_origin_codes),
+         race_hispanic_origin = recode(race_hispanic_origin, !!! race_hispanic_origin_codes),
          sex = recode(sex, !!! sex_codes),
-         record_code = pull(pop, record_code)) %>%
+         record_code = pull(messy_state_population_data, record_code)) %>%
+  separate(race_hispanic_origin, c("race", "hispanic_origin"), sep = ", ") %>%
   select(record_code, everything()) %>%
   left_join(state_fips, by = "state_code")
 
-all_population_data_1981_1989 <- population_data_1981_1989 %>%
+tidy_state_population_data <- messy_state_population_data %>%
   gather(age_group, population, -record_code) %>%
-  left_join(decoded_record_data, by = "record_code") %>%
-  select(year, state_code, state, race_ethnic_origin, sex, age_group, everything(), -record_code)
+  left_join(decoded_records, by = "record_code") %>%
+  select(year, state, hispanic_origin, race, sex, age_group, everything(), -record_code, -state_code) %>%
+  arrange(year, state, hispanic_origin, race, sex, age_group)
   
-write_tsv(all_population_data_1981_1989, file.path("data", "processed", "population-data-1981-1989.tsv"))
+write_tsv(tidy_state_population_data, file.path("data", "processed", "state-population-data-1981-1989.tsv"))
