@@ -1,2 +1,3 @@
-# us-population-data
-🇺🇸 Scripts to get U.S. Census Bureau data on population estimates by state (1970 to 2019) and county (1990 to 2019).
+# uspops
+
+US Census Bureau population estimates by state (1970-2017) and county (1990-2017). 

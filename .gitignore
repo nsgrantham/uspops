@@ -1,5 +1,8 @@
 *.Rproj.user
 *.Rproj
+*.Rhistory
 
-data
-.Rproj.user
+data-raw/*.csv
+data-raw/*.tsv
+data-raw/*.txt
+data-raw/*.xlsx

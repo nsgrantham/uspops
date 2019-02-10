@@ -1,8 +1,6 @@
 library(tidyverse)
 
-state_county_fips <- read_tsv(file.path("data", "processed", "state-county-fips.tsv"))
-
-state_fips <- read_tsv(file.path("data", "processed", "state-fips.tsv"))
+cat("Getting U.S. Census Bureau population estimates by county (2000-2010) ...\n")
 
 year_codes <- list(
   "2" = 2000,
@@ -40,18 +38,10 @@ age_group_codes <- list(
   "18" = "85+"
 )
 
-state_codes_except_puerto_rico <- state_fips %>%
-  filter(state != "Puerto Rico") %>%
-  pull(state_code)
+county_fips <- read_tsv(file.path("data-raw", "county-fips.tsv"), col_types = cols(), progress = FALSE)
 
-messy_county_population_data_urls <- paste0(
-  "https://www2.census.gov/programs-surveys/popest/datasets/2000-2010/intercensal/county/co-est00int-alldata-",
-  state_codes_except_puerto_rico,
-  ".csv"
-)
-
-tidy_up_population_data <- function(population_data_url) {
-  read_csv(population_data_url) %>%
+tidy_up_county_pops <- function(county_pops_url) {
+  read_csv(county_pops_url, col_types = cols(), progress = FALSE) %>%
     select(state = STNAME, county = CTYNAME, year = YEAR, age_group = AGEGRP,
            `Hispanic, White, Male` = HWA_MALE, 
            `Hispanic, White, Female` = HWA_FEMALE, 
@@ -78,23 +68,27 @@ tidy_up_population_data <- function(population_data_url) {
            `Non-Hispanic, Two or More Races, Male` = NHTOM_MALE,
            `Non-Hispanic, Two or More Races, Female` = NHTOM_FEMALE) %>%
     filter(year %in% c(2:11, 13), age_group != 99) %>%
-    gather(hispanic_origin_race_sex, population, -state, -county, -year, -age_group) %>%
+    gather(hispanic_origin_race_sex, pop, -state, -county, -year, -age_group) %>%
     mutate(year = recode(year, !!! year_codes),
-           age_group = recode(age_group, !!! age_group_codes)) %>%
+           age_group = fct_relevel(recode(age_group, !!! age_group_codes), !! age_group_codes)) %>%
     separate(hispanic_origin_race_sex, c("hispanic_origin", "race", "sex"), sep = ", ") %>% 
-    left_join(state_county_fips, by = c("state", "county")) %>%
-    select(year, state, county, hispanic_origin, race, sex, age_group, population)
+    left_join(county_fips, by = c("state", "county")) %>%
+    select(year, state, county, hispanic_origin, race, sex, age_group, pop)
 }
 
-tidy_county_population_data <- messy_county_population_data_urls %>%
-  map_dfr(tidy_up_population_data) %>%
-  arrange(year, state, county, hispanic_origin, race, sex, age_group)
+state_fips_except_puerto_rico <- read_tsv(file.path("data-raw", "state-fips.tsv"), col_types = cols()) %>%
+  filter(state != "Puerto Rico")
 
-write_tsv(tidy_county_population_data, file.path("data", "processed", "county-population-data-2000-2010.tsv"))
+paste0("https://www2.census.gov/programs-surveys/popest/datasets/2000-2010/intercensal/county/co-est00int-alldata-",
+       pull(state_fips_except_puerto_rico, state_code), ".csv") %>%
+  set_names(pull(state_fips_except_puerto_rico, state)) %>%
+  imap_dfr(function(url, state) {
+    cat(paste("  Tidying", state, "counties ... "))
+    county_pops <- tidy_up_county_pops(url)
+    cat("Done.\n")
+    county_pops
+  }) %>%
+  arrange(year, state, county, hispanic_origin, race, sex, age_group) %>%
+  write_tsv(file.path("data-raw", "tidy-county-pops-2000-2010.tsv"))
 
-tidy_state_population_data <- tidy_county_population_data %>%
-  group_by(year, state, hispanic_origin, race, sex, age_group) %>%
-  summarize(population = sum(population))
-
-write_tsv(tidy_state_population_data, file.path("data", "processed", "state-population-data-2000-2010.tsv"))
-
+cat("Done.\n")
