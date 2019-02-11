@@ -1,11 +1,12 @@
 Package: uspops
 Type: Package
-Title: US Census Bureau Population Estimates by State (1970-2017) and County (1990-2017)
+Title: US Population Data by State, 1970 to 2017, and County, 1990 to 2017
 Version: 0.1.0
 Author: Neal Grantham
 Maintainer: Neal Grantham <neal@nsgrantham.com>
-Description: US population data by state (1970-2017) and county (1990-2017) 
-      with variables Hispanic origin, race, sex, and age group.
+Description: US state and county population data with variables 'year', 'state',
+    'county' (county dataset only), 'hispanic_origin', 'race', 'sex', 'age_group',
+    and 'pop', the population as measured by the US Census Bureau.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

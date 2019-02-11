@@ -1,6 +1,6 @@
 library(tidyverse)
 
-cat("Getting U.S. Census Bureau population estimates by county (2011-2017) ...\n")
+cat("Getting county population data for 2011-2017 ...\n")
 
 county_fips <- read_tsv(file.path("data-raw", "county-fips.tsv"), col_types = cols())
 
@@ -68,8 +68,10 @@ tidy_up_county_pops <- function(url) {
     mutate(year = recode(year, !!! year_codes),
            age_group = fct_relevel(recode(age_group, !!! age_group_codes), !! age_group_codes)) %>%
     separate(hispanic_origin_race_sex, c("hispanic_origin", "race", "sex"), sep = ", ") %>% 
-    left_join(county_fips, by = c("state", "county")) %>%
-    select(year, state, county, hispanic_origin, race, sex, age_group, pop)
+    mutate(age_group = recode(age_group, "0" = "0-4", "1" = "0-4")) %>%
+    group_by(year, state, county, hispanic_origin, race, sex, age_group) %>%
+    mutate(pop = sum(pop)) %>%
+    ungroup()
 }
 
 state_fips_except_puerto_rico <- read_tsv(file.path("data-raw", "state-fips.tsv"), col_types = cols()) %>%
@@ -79,12 +81,12 @@ paste0("https://www2.census.gov/programs-surveys/popest/datasets/2010-2017/count
        pull(state_fips_except_puerto_rico, state_code), ".csv") %>%
   set_names(pull(state_fips_except_puerto_rico, state)) %>%
   imap_dfr(function(url, state) {
-    cat("  Tidying", state, "counties ... ")
+    cat("  Getting data for", state, "... ")
     county_pops <- tidy_up_county_pops(url)
     cat("Done.\n")
     county_pops
   }) %>%
   arrange(year, state, county, hispanic_origin, race, sex, age_group) %>%
-  write_tsv(file.path("data-raw", "tidy-county-pops-2011-2017.tsv"))
+  write_tsv(file.path("data-raw", "county-pops-2011-2017.tsv"))
 
 cat("Done.")

@@ -3,11 +3,13 @@ library(tidyverse)
 # Source: https://www.census.gov/data/datasets/time-series/demo/popest/1980s-state.html
 # README: https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/1980-1990/st_int_asrh_doc.txt
 
-cat("Getting U.S. Census Bureau population estimates by state (1981-1989) ... ")
+cat("Getting state population data for 1981 to 1989 ... ")
 
-source_file <- "https://www2.census.gov/programs-surveys/popest/datasets/1980-1990/state/asrh/st_int_asrh.txt"
 target_file <- file.path("data-raw", "messy-state-pops-1981-1989.txt")
-download.file(source_file, target_file, quiet = TRUE)
+if (!file.exists(target_file)) {
+  source_file <- "https://www2.census.gov/programs-surveys/popest/datasets/1980-1990/state/asrh/st_int_asrh.txt"
+  download.file(source_file, target_file, quiet = TRUE)
+}
 
 age_groups <- c("0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", 
                 "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85+")
@@ -65,6 +67,6 @@ messy_state_pops %>%
   mutate(age_group = fct_relevel(age_group, !! age_groups)) %>%
   select(year, state, hispanic_origin, race, sex, age_group, pop, -record_code, -state_code) %>%
   arrange(year, state, hispanic_origin, race, sex, age_group) %>%
-  write_tsv(file.path("data-raw", "tidy-state-pops-1981-1989.tsv"))
+  write_tsv(file.path("data-raw", "state-pops-1981-1989.tsv"))
 
 cat("Done.\n")

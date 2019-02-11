@@ -1,3 +1,3 @@
 # uspops
 
-US Census Bureau population estimates by state (1970-2017) and county (1990-2017). 
+US population data by state (1970 to 2017) and county (1990 to 2017). 

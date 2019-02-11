@@ -6,3 +6,4 @@ data-raw/*.csv
 data-raw/*.tsv
 data-raw/*.txt
 data-raw/*.xlsx
+.Rproj.user

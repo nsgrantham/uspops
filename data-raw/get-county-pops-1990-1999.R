@@ -1,6 +1,6 @@
 library(tidyverse)
 
-cat("Getting U.S. Census Bureau population estimates by county (1990-1999) ... \n")
+cat("Getting county population data for 1990 to 1999 ... \n")
 
 year_codes <- list(
   "90" = 1990,
@@ -65,19 +65,22 @@ tidy_up_county_pops <- function(county_pops_url) {
            hispanic_origin = recode(hispanic_origin, !!! hispanic_origin_codes)) %>%
     separate(race_sex, c("race", "sex"), sep = ", ") %>%
     left_join(county_fips, by = "county_code") %>%
-    select(year, state, county, hispanic_origin, race, sex, age_group, pop)
+    mutate(age_group = recode(age_group, "0" = "0-4", "1" = "0-4")) %>%
+    group_by(year, state, county, hispanic_origin, race, sex, age_group) %>%
+    mutate(pop = sum(pop)) %>%
+    ungroup()
 }
 
 paste0("https://www2.census.gov/programs-surveys/popest/tables/1990-2000/intercensal/st-co/stch-icen",
        unlist(year_codes), ".txt") %>%
   set_names(unlist(year_codes)) %>%
   imap_dfr(function(url, year) {
-    cat(paste("  Tidying data from", year, "... "))
+    cat(paste("  Getting data for", year, "... "))
     county_pops <- tidy_up_county_pops(url)
     cat("Done.\n")
     county_pops
   }) %>%
   arrange(year, state, county, hispanic_origin, race, sex, age_group) %>%
-  write_tsv(file.path("data-raw", "tidy-county-pops-1990-1999.tsv"))
+  write_tsv(file.path("data-raw", "county-pops-1990-1999.tsv"))
 
 cat("Done.\n")

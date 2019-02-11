@@ -23,9 +23,9 @@ col_types <- list(
 
 cat("Combining all state population datasets and saving as 'statepops' ...\n")
 
-statepops <- file.path("data-raw", c("tidy-state-pops-1970-1980.tsv", "tidy-state-pops-1981-1989.tsv",
-                                     "tidy-state-pops-1990-1999.tsv", "tidy-state-pops-2000-2010.tsv",
-                                     "tidy-state-pops-2011-2017.tsv")) %>% 
+statepops <- file.path("data-raw", c("state-pops-1970-1980.tsv", "state-pops-1981-1989.tsv",
+                                     "state-pops-1990-1999.tsv", "state-pops-2000-2010.tsv",
+                                     "state-pops-2011-2017.tsv")) %>% 
   map_dfr(function(file) suppressWarnings(read_tsv(file, col_types = col_types, progress = FALSE))) %>%
   select(year, state, hispanic_origin, race, sex, age_group, pop)
 
@@ -35,8 +35,8 @@ cat("Done. Load the dataset with 'data(statepops)'.\n")
 
 cat("Combining all county population datasets and saving as 'countypops' ...\n")
   
-countypops <- file.path("data-raw", c("tidy-county-pops-1990-1999.tsv", "tidy-county-pops-2000-2010.tsv",
-                                      "tidy-county-pops-2011-2017.tsv")) %>% 
+countypops <- file.path("data-raw", c("county-pops-1990-1999.tsv", "county-pops-2000-2010.tsv",
+                                      "county-pops-2011-2017.tsv")) %>% 
   map_dfr(function(file) read_tsv(file, col_types = col_types, progress = FALSE)) %>%
   select(year, state, hispanic_origin, race, sex, age_group, pop)
 
