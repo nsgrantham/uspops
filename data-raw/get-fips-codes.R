@@ -43,5 +43,4 @@ current_fips_2017 %>%
   arrange(county_code) %>%
   write_tsv(file.path("data-raw", "county-fips.tsv"))
 
-
 cat("Done.\n")
