@@ -1,16 +1,15 @@
 Package: uspops
 Type: Package
-Title: US and State Population Data 1900-2018
-Version: 0.1.0
-Author: Neal Grantham
-Maintainer: Neal Grantham <neal@nsgrantham.com>
+Title: US Census Bureau Population Data 1900-2018
+Version: 0.2.0
+Authors@R: person("Neal", "Grantham", email = "neal@nsgrantham.com", role = c("aut", "cre"))
 Description: US Census Bureau population estimates 1900-2018 for the US,
-    District of Columbia, the first 48 states, Alaska (granted statehood 
-    in 1959, estimates since 1950), Hawaii (granted statehood in 1959, 
-    estimates since 1950), and US territory Puerto Rico (estimates since 
-    2010).
+    District of Columbia, the first 48 states, Alaska (since 1950), 
+    Hawaii (since 1950), and Puerto Rico (since 2010).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: tibble
+URL: http://github.com/nsgrantham/uspops
+BugReports: http://github.com/nsgrantham/uspops/issues
+Depends: R (>= 2.10)
 RoxygenNote: 6.1.1

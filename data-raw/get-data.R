@@ -20,7 +20,8 @@ parse_pre_1970s_txt <- function(url, year_cols_1, us_skip_1, state_skip_1,
     mutate(us_name = recode(us_abbr, !!! us_names)) %>%
     select(-one_of(c("us_abbr", drop_vars))) %>%
     gather(year, pop, -us_name) %>%
-    mutate(year = as.integer(year), pop = 1000 * pop)
+    mutate(year = as.integer(year), 
+           pop = as.integer(1000 * pop))
 }
 
 pops <- list()
@@ -83,7 +84,8 @@ pops[["1970s"]] <- read_table(raw_data_1970s, col_names = c("fips", "us_abbr", a
   mutate(us_name = recode(us_abbr, !!! us_names)) %>%
   select(-fips.x, -fips.y, -census_1980, -us_abbr) %>%
   gather(year, pop, -us_name) %>%
-  mutate(year = as.integer(year))
+  mutate(year = as.integer(year),
+         pop = as.integer(pop))
 
 raw_data_1980s <- read_file("https://www2.census.gov/programs-surveys/popest/tables/1980-1990/state/asrh/st8090ts.txt")
 
@@ -92,7 +94,8 @@ pops[["1980s"]] <- read_table(raw_data_1980s, col_names = c("us_abbr", as.charac
   mutate(us_name = recode(us_abbr, !!! us_names)) %>%
   select(-census_1990, -us_abbr) %>%
   gather(year, pop, -us_name) %>%
-  mutate(year = as.integer(year))
+  mutate(year = as.integer(year),
+         pop = as.integer(pop))
 
 pops[["1990s"]] <- pdf_text("https://www2.census.gov/programs-surveys/popest/tables/1990-2000/intercensal/st-co/co-est2001-12-00.pdf") %>%
   str_split("\n") %>%
@@ -100,7 +103,7 @@ pops[["1990s"]] <- pdf_text("https://www2.census.gov/programs-surveys/popest/tab
   str_replace("USA", "United States") %>%
   Filter(function(x) any(startsWith(x, us_names)), .) %>%
   str_replace_all(",", "") %>%
-  str_split("\\s+") %>%
+  str_split("\\s+") %>%  # split on any number of whitespace characters
   lapply(function(x) {
     rev_x <- rev(x)
     us_name <- paste(rev_x[length(x):13], collapse = " ")
@@ -112,7 +115,8 @@ pops[["1990s"]] <- pdf_text("https://www2.census.gov/programs-surveys/popest/tab
   as_tibble() %>%
   select(-base_1990, -census_2000) %>%
   gather(year, pop, -us_name) %>%
-  mutate(year = as.integer(year), pop = as.integer(pop))
+  mutate(year = as.integer(year), 
+         pop = as.integer(pop))
 
 pops[["2000s"]] <- read_csv("https://www2.census.gov/programs-surveys/popest/datasets/2000-2009/national/totals/nst_est2009_alldata.csv",
                             col_types = cols(), progress = FALSE) %>%
@@ -129,7 +133,8 @@ pops[["2000s"]] <- read_csv("https://www2.census.gov/programs-surveys/popest/dat
          `2008` = POPESTIMATE2008,
          `2009` = POPESTIMATE2009) %>%
   gather(year, pop, -us_name) %>%
-  mutate(year = as.integer(year))
+  mutate(year = as.integer(year),
+         pop = as.integer(pop))
 
 pops[["2010s"]] <- read_csv("https://www2.census.gov/programs-surveys/popest/datasets/2010-2018/national/totals/nst-est2018-alldata.csv",
                             col_types = cols(), progress = FALSE) %>%
@@ -145,7 +150,8 @@ pops[["2010s"]] <- read_csv("https://www2.census.gov/programs-surveys/popest/dat
          `2017` = POPESTIMATE2017,
          `2018` = POPESTIMATE2018) %>%
   gather(year, pop, -us_name) %>%
-  mutate(year = as.integer(year))
+  mutate(year = as.integer(year),
+         pop = as.integer(pop))
 
 us_pops <- bind_rows(pops) %>%
   filter(us_name == "United States") %>%
@@ -165,8 +171,8 @@ state_pops %>%
   group_by(year) %>%
   summarize(pop = sum(pop)) %>%
   left_join(us_pops, by = "year", suffix = c("_us", "_state_sum")) %>%
-  mutate(within_half_percent = (0.995 * pop_state_sum < pop_us) && (pop_us < 1.005 * pop_state_sum)) %>%
-  pull(within_half_percent) %>%
-  all()
+  mutate(within_tenth_percent = (0.999 * pop_state_sum < pop_us) && (pop_us < 1.001 * pop_state_sum)) %>%
+  pull(within_tenth_percent) %>%
+  all()  # TRUE
 
 save(state_pops, file = file.path("data", "state_pops.rda"))

@@ -3,21 +3,26 @@
 \docType{data}
 \name{state_pops}
 \alias{state_pops}
-\title{State population data, 1900-2018}
-\format{A data frame (specifically a tbl_df) with 5,927 observations and 3 variables: 
-        \code{year}, \code{state}, and \code{pop}, the population of the given state 
-        on July 1st of the given year as estimated by the US Census Bureau. Two 
-        exceptions are 1970 and 1980 where \code{pop} is the estimated state population 
-        on April 1st. For years before 1970, \code{pop} is rounded to the nearest thousandth.
-        Population estimates for the first 48 states and District of Columbia are included 
-        for all years. Population estimates for Alaska (granted statehood in 1959) are 
-        included beginning in 1950. Population estimates for Hawaii (granted statehood in 
-        1959) are included beginning in 1950. Population estimates for the US territory 
-        Puerto Rico are included beginning in 2010.}
+\title{State population data from the US Census Bureau, 1900-2018}
+\format{A data frame (specifically a tbl_df) with 5,978 observations and 3 variables:
+\describe{
+  \item{\code{year}}{Year of the population estimate.}
+  \item{\code{state}}{Name of state, "District of Columbia", or "Puerto Rico".}
+  \item{\code{pop}}{State population on July 1st as estimated by the US Census Bureau.
+    Two exceptions are 1970 and 1980 where the population is estimated for April 1st.}
+}}
 \usage{
 state_pops
 }
 \description{
-State population data, 1900-2018
+State population data from the US Census Bureau, 1900-2018
+}
+\details{
+For years before 1970, \code{pop} is rounded to the nearest thousandth.
+
+For each year from 1900 to 2018, \code{pop} is available for the first 48 states and 
+District of Columbia. Beginning in 1950, \code{pop} is available for Alaska and Hawaii,
+both of which were granted statehood in 1959. Beginning in 2010, \code{pop} is available
+for Puerto Rico, a US territory.
 }
 \keyword{datasets}
