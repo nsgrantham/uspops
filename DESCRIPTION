@@ -3,9 +3,9 @@ Type: Package
 Title: US Census Bureau Population Data 1900-2018
 Version: 0.2.0
 Authors@R: person("Neal", "Grantham", email = "neal@nsgrantham.com", role = c("aut", "cre"))
-Description: US Census Bureau population estimates 1900-2018 for the US,
-    District of Columbia, the first 48 states, Alaska (since 1950), 
-    Hawaii (since 1950), and Puerto Rico (since 2010).
+Description: US Census Bureau 1900-2018 population estimates for the US,
+    all 50 states (Alaska and Hawaii since 1950), District of Columbia, 
+    and Puerto Rico (since 2010).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -1,4 +1,4 @@
-# 🇺🇸  uspops
+# uspops 🇺🇸
 
 [![Travis-CI Build Status](https://travis-ci.org/nsgrantham/uspops.svg?branch=master)](https://travis-ci.org/nsgrantham/uspops)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/nsgrantham/uspops?branch=master&svg=true)](https://ci.appveyor.com/project/nsgrantham/uspops)
@@ -14,8 +14,8 @@ This package contains two datasets provided by the US Census Bureau:
   Puerto Rico (since 2010) on July 1st. Two exceptions are 1970 and 1980
   where the estimates are made for April 1st.  
 
-To make `us_pops` and `state_pops`, [`data-raw/get-data.R`](data-raw/get-data.R) u
-uses e following US Census Bureau files:
+The datasets were made with [`get-data.R`](data-raw/get-data.R) in `data-raw`, which 
+downloads and tidies the following US Census Bureau files:
 
 * [Population estimates 1900-1909](https://www2.census.gov/programs-surveys/popest/tables/1980-1990/state/asrh/st0009ts.txt)
 
