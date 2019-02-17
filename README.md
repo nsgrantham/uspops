@@ -12,7 +12,7 @@ This package contains two datasets provided by the US Census Bureau:
 * `state_pops`: For each year from 1900 to 2018, the estimated population of
   of all 50 states (Alaska and Hawaii since 1950), District of Columbia, and 
   Puerto Rico (since 2010) on July 1st (extwo exceptions are 1970 and 1980 where
-  the estimates are made for April 1st).The datasets are tidy and made from the following non-tidy US Census Bureau files:
+  the estimates are made for April 1st).  The datasets are tidy and made from the following non-tidy US Census Bureau files:
 
 * [Population estimates 1900-1909](https://www2.census.gov/programs-surveys/popest/tables/1980-1990/state/asrh/st0009ts.txt)
 
