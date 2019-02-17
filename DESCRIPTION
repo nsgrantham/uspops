@@ -1,0 +1,15 @@
+Package: uspops
+Type: Package
+Title: US Census Bureau Population Data 1900-2018
+Version: 0.2.0
+Authors@R: person("Neal", "Grantham", email = "neal@nsgrantham.com", role = c("aut", "cre"))
+Description: US Census Bureau 1900-2018 population estimates for the US,
+    all 50 states (Alaska and Hawaii since 1950), District of Columbia, 
+    and Puerto Rico (since 2010).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+URL: http://github.com/nsgrantham/uspops
+BugReports: http://github.com/nsgrantham/uspops/issues
+Depends: R (>= 2.10)
+RoxygenNote: 6.1.1
