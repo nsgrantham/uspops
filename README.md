@@ -1,20 +1,18 @@
-# uspops 🇺🇸
+# 🇺🇸 uspops
 
 [![Travis-CI Build Status](https://travis-ci.org/nsgrantham/uspops.svg?branch=master)](https://travis-ci.org/nsgrantham/uspops)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/nsgrantham/uspops?branch=master&svg=true)](https://ci.appveyor.com/project/nsgrantham/uspops)
 
 This package contains two datasets provided by the US Census Bureau:
 
-* `us_pops`: For each year from 1900 to 2018, the population estimate of 
-  the United States on July 1st (except for 1970 and 1980 where the 
-  estimate is given for April 1st).
+* `us_pops`: For each year from 1900 to 2018, the estimated population of 
+  the United States on July 1st (extwo exceptions are 1970 and 1980 where the 
+  estimates are made for April 1st
 
-* `state_pops`: For each year from 1900 to 2018, the population estimate 
-  of District of Columbia, the first 48 states, Alaska (granted statehood in
-  1959, estimates since 1950), Hawaii (granted statehood in 1959, estimates 
-  since 1950), and the US territory Puerto Rico (estimates since 2010).
-
-The datasets are tidy and made from the following non-tidy US Census Bureau files:
+* `state_pops`: For each year from 1900 to 2018, the estimated population of
+  of all 50 states (Alaska and Hawaii since 1950), District of Columbia, and 
+  Puerto Rico (since 2010) on July 1st (extwo exceptions are 1970 and 1980 where
+  the estimates are made for April 1st).The datasets are tidy and made from the following non-tidy US Census Bureau files:
 
 * [Population estimates 1900-1909](https://www2.census.gov/programs-surveys/popest/tables/1980-1990/state/asrh/st0009ts.txt)
 
