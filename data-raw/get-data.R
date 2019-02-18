@@ -65,16 +65,16 @@ pops[["1940s"]] <- parse_pre_1970s_txt(
 # population estimates are included beginning in 1950.
 pops[["1950s"]] <- parse_pre_1970s_txt(
   "https://www2.census.gov/programs-surveys/popest/tables/1980-1990/state/asrh/st5060ts.txt",
-  year_cols_1 = as.character(1950:1955), us_skip_1 = 17, state_skip_1 = 27,
-  year_cols_2 = as.character(1956:1959), us_skip_2 = 82, state_skip_2 = 92,
-  state_n_max = 51
+  year_cols_1 = c("1950_census", as.character(1950:1954)), us_skip_1 = 17, state_skip_1 = 27,
+  year_cols_2 = c(as.character(1955:1959), "1960_census"), us_skip_2 = 82, state_skip_2 = 92,
+  state_n_max = 51, drop_vars = c("1950_census", "1960_census")
 )
 
 pops[["1960s"]] <- parse_pre_1970s_txt(
   "https://www2.census.gov/programs-surveys/popest/tables/1980-1990/state/asrh/st6070ts.txt",
-  year_cols_1 = as.character(1960:1965), us_skip_1 = 17, state_skip_1 = 24,
-  year_cols_2 = as.character(1966:1969), us_skip_2 = 80, state_skip_2 = 86,
-  state_n_max = 51
+  year_cols_1 = c("1960_census", as.character(1960:1964)), us_skip_1 = 17, state_skip_1 = 24,
+  year_cols_2 = c(as.character(1965:1969), "1970_census"), us_skip_2 = 80, state_skip_2 = 86,
+  state_n_max = 51, drop_vars = c("1960_census", "1970_census")
 )
 
 raw_data_1970s <- read_file("https://www2.census.gov/programs-surveys/popest/tables/1980-1990/state/asrh/st7080ts.txt")
